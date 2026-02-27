@@ -576,6 +576,11 @@ document.addEventListener('DOMContentLoaded', () => {
   renderAddons();
   renderAssumptions();
   calculate();
+  // Ensure key cards are open by default
+  ['card-project','card-addons','card-breakdown','card-payment','card-share'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('collapsed');
+  });
 });
 
 // ── RENDER ADD-ONS ────────────────────────────────────────────
@@ -892,9 +897,13 @@ function fmtPDF$(n) {
 
 // ── GENERATE FULL PDF PACKET ──────────────────────────────
 function generatePDF() {
-  const c = window._lastCalc;
   const sqft = parseFloat(document.getElementById('sqft').value)||0;
   if (!sqft) { alert('Please enter square footage first.'); return; }
+
+  // Always recalculate before generating so _lastCalc is fresh
+  calculate();
+  const c = window._lastCalc;
+  if (!c || !c.grandTotal) { alert('Calculation error — please check your inputs.'); return; }
 
   const btn = document.getElementById('pdf-btn');
   btn.textContent = '⏳ Building PDF...';
@@ -1343,4 +1352,3 @@ function generatePDF() {
 </script>
 </body>
 </html>
-
